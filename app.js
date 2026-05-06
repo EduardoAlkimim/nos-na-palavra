@@ -1,33 +1,39 @@
-// ============================================
+// ═══════════════════════════════════════════
 //  NÓS NA PALAVRA — App Logic
-//  Firebase Firestore + GitHub Pages
-// ============================================
+//  Dark Minimal · Firebase · GitHub Pages
+// ═══════════════════════════════════════════
 
-// ---- DADOS BÍBLICOS ----
+// ── Aguarda Firebase ──────────────────────
+let _fbReady = false;
+window._dispatchFBReady = () => { _fbReady = true; _fbCallbacks.forEach(f => f()); };
+const _fbCallbacks = [];
+function onFBReady(fn) { if (_fbReady) fn(); else _fbCallbacks.push(fn); }
+
+// ── Livros bíblicos ───────────────────────
 const BOOKS = [
-  {n:"Gênesis",c:50,t:"AT"},{n:"Êxodo",c:40,t:"AT"},{n:"Levítico",c:27,t:"AT"},
-  {n:"Números",c:36,t:"AT"},{n:"Deuteronômio",c:34,t:"AT"},{n:"Josué",c:24,t:"AT"},
-  {n:"Juízes",c:21,t:"AT"},{n:"Rute",c:4,t:"AT"},{n:"1 Samuel",c:31,t:"AT"},
-  {n:"2 Samuel",c:24,t:"AT"},{n:"1 Reis",c:22,t:"AT"},{n:"2 Reis",c:25,t:"AT"},
-  {n:"1 Crônicas",c:29,t:"AT"},{n:"2 Crônicas",c:36,t:"AT"},{n:"Esdras",c:10,t:"AT"},
-  {n:"Neemias",c:13,t:"AT"},{n:"Ester",c:10,t:"AT"},{n:"Jó",c:42,t:"AT"},
-  {n:"Salmos",c:150,t:"AT"},{n:"Provérbios",c:31,t:"AT"},{n:"Eclesiastes",c:12,t:"AT"},
-  {n:"Cantares",c:8,t:"AT"},{n:"Isaías",c:66,t:"AT"},{n:"Jeremias",c:52,t:"AT"},
-  {n:"Lamentações",c:5,t:"AT"},{n:"Ezequiel",c:48,t:"AT"},{n:"Daniel",c:12,t:"AT"},
-  {n:"Oséias",c:14,t:"AT"},{n:"Joel",c:3,t:"AT"},{n:"Amós",c:9,t:"AT"},
-  {n:"Obadias",c:1,t:"AT"},{n:"Jonas",c:4,t:"AT"},{n:"Miquéias",c:7,t:"AT"},
-  {n:"Naum",c:3,t:"AT"},{n:"Habacuque",c:3,t:"AT"},{n:"Sofonias",c:3,t:"AT"},
-  {n:"Ageu",c:2,t:"AT"},{n:"Zacarias",c:14,t:"AT"},{n:"Malaquias",c:4,t:"AT"},
-  {n:"Mateus",c:28,t:"NT"},{n:"Marcos",c:16,t:"NT"},{n:"Lucas",c:24,t:"NT"},
-  {n:"João",c:21,t:"NT"},{n:"Atos",c:28,t:"NT"},{n:"Romanos",c:16,t:"NT"},
-  {n:"1 Coríntios",c:16,t:"NT"},{n:"2 Coríntios",c:13,t:"NT"},{n:"Gálatas",c:6,t:"NT"},
-  {n:"Efésios",c:6,t:"NT"},{n:"Filipenses",c:4,t:"NT"},{n:"Colossenses",c:4,t:"NT"},
-  {n:"1 Tessalonicenses",c:5,t:"NT"},{n:"2 Tessalonicenses",c:3,t:"NT"},
-  {n:"1 Timóteo",c:6,t:"NT"},{n:"2 Timóteo",c:4,t:"NT"},{n:"Tito",c:3,t:"NT"},
-  {n:"Filemom",c:1,t:"NT"},{n:"Hebreus",c:13,t:"NT"},{n:"Tiago",c:5,t:"NT"},
-  {n:"1 Pedro",c:5,t:"NT"},{n:"2 Pedro",c:3,t:"NT"},{n:"1 João",c:5,t:"NT"},
-  {n:"2 João",c:1,t:"NT"},{n:"3 João",c:1,t:"NT"},{n:"Judas",c:1,t:"NT"},
-  {n:"Apocalipse",c:22,t:"NT"}
+  {n:"Gênesis",c:50,g:"AT"},{n:"Êxodo",c:40,g:"AT"},{n:"Levítico",c:27,g:"AT"},
+  {n:"Números",c:36,g:"AT"},{n:"Deuteronômio",c:34,g:"AT"},{n:"Josué",c:24,g:"AT"},
+  {n:"Juízes",c:21,g:"AT"},{n:"Rute",c:4,g:"AT"},{n:"1 Samuel",c:31,g:"AT"},
+  {n:"2 Samuel",c:24,g:"AT"},{n:"1 Reis",c:22,g:"AT"},{n:"2 Reis",c:25,g:"AT"},
+  {n:"1 Crônicas",c:29,g:"AT"},{n:"2 Crônicas",c:36,g:"AT"},{n:"Esdras",c:10,g:"AT"},
+  {n:"Neemias",c:13,g:"AT"},{n:"Ester",c:10,g:"AT"},{n:"Jó",c:42,g:"AT"},
+  {n:"Salmos",c:150,g:"AT"},{n:"Provérbios",c:31,g:"AT"},{n:"Eclesiastes",c:12,g:"AT"},
+  {n:"Cantares",c:8,g:"AT"},{n:"Isaías",c:66,g:"AT"},{n:"Jeremias",c:52,g:"AT"},
+  {n:"Lamentações",c:5,g:"AT"},{n:"Ezequiel",c:48,g:"AT"},{n:"Daniel",c:12,g:"AT"},
+  {n:"Oséias",c:14,g:"AT"},{n:"Joel",c:3,g:"AT"},{n:"Amós",c:9,g:"AT"},
+  {n:"Obadias",c:1,g:"AT"},{n:"Jonas",c:4,g:"AT"},{n:"Miquéias",c:7,g:"AT"},
+  {n:"Naum",c:3,g:"AT"},{n:"Habacuque",c:3,g:"AT"},{n:"Sofonias",c:3,g:"AT"},
+  {n:"Ageu",c:2,g:"AT"},{n:"Zacarias",c:14,g:"AT"},{n:"Malaquias",c:4,g:"AT"},
+  {n:"Mateus",c:28,g:"NT"},{n:"Marcos",c:16,g:"NT"},{n:"Lucas",c:24,g:"NT"},
+  {n:"João",c:21,g:"NT"},{n:"Atos",c:28,g:"NT"},{n:"Romanos",c:16,g:"NT"},
+  {n:"1 Coríntios",c:16,g:"NT"},{n:"2 Coríntios",c:13,g:"NT"},{n:"Gálatas",c:6,g:"NT"},
+  {n:"Efésios",c:6,g:"NT"},{n:"Filipenses",c:4,g:"NT"},{n:"Colossenses",c:4,g:"NT"},
+  {n:"1 Tessalonicenses",c:5,g:"NT"},{n:"2 Tessalonicenses",c:3,g:"NT"},
+  {n:"1 Timóteo",c:6,g:"NT"},{n:"2 Timóteo",c:4,g:"NT"},{n:"Tito",c:3,g:"NT"},
+  {n:"Filemom",c:1,g:"NT"},{n:"Hebreus",c:13,g:"NT"},{n:"Tiago",c:5,g:"NT"},
+  {n:"1 Pedro",c:5,g:"NT"},{n:"2 Pedro",c:3,g:"NT"},{n:"1 João",c:5,g:"NT"},
+  {n:"2 João",c:1,g:"NT"},{n:"3 João",c:1,g:"NT"},{n:"Judas",c:1,g:"NT"},
+  {n:"Apocalipse",c:22,g:"NT"}
 ];
 
 const VERSES = [
@@ -41,159 +47,269 @@ const VERSES = [
   {t:"Sede fortes e corajosos. Não temais, nem vos assusteis.",r:"Deuteronômio 31:6"},
   {t:"Buscai, pois, em primeiro lugar, o seu reino e a sua justiça.",r:"Mateus 6:33"},
   {t:"O amor nunca falha.",r:"1 Coríntios 13:8"},
-  {t:"Porque onde estiverem dois ou três reunidos em meu nome, ali estou eu no meio deles.",r:"Mateus 18:20"},
+  {t:"Onde estiverem dois ou três reunidos em meu nome, ali estou eu no meio deles.",r:"Mateus 18:20"},
   {t:"E nós amamos a Deus porque ele nos amou primeiro.",r:"1 João 4:19"},
   {t:"Alegrai-vos na esperança, sede pacientes na tribulação, perseverai na oração.",r:"Romanos 12:12"},
   {t:"A tua palavra é uma lâmpada para os meus pés e uma luz para o meu caminho.",r:"Salmos 119:105"},
   {t:"Porque eu bem sei os planos que tenho para vocês, diz o Senhor.",r:"Jeremias 29:11"},
 ];
 
-// ---- ESTADO GLOBAL ----
-let currentUser = null; // 'dudu' | 'thata'
-let noteView = 'minhas';
-let msgWho = null; // set on sendInteraction
+const EMOJIS = [
+  "📖","✝️","🕊️","🙏","✨","🌟","⭐","🌙","☀️","🌿",
+  "🌸","🌺","🌹","🦋","💛","💙","💗","💜","❤️","🔥",
+  "🫶","🫂","👑","🎵","🎶","🕯️","⛪","🏔️","🌊","🐦",
+  "🍀","🌱","🌾","🍇","🍞","🏺","📜","📝","🗝️","🛡️"
+];
 
-// ---- AGUARDAR FIREBASE ----
-function waitForFirebase(cb, attempts = 0) {
-  if (window._fb && window._db) { cb(); return; }
-  if (attempts > 40) { console.error('Firebase não carregou'); cb(); return; }
-  setTimeout(() => waitForFirebase(cb, attempts + 1), 150);
+// ── PERFIS (localStorage) ─────────────────
+const DEFAULT_PROFILES = {
+  dudu:  { name: 'Dudu',  emoji: '📖' },
+  thata: { name: 'Thata', emoji: '🌸' }
+};
+
+function getProfiles() {
+  try {
+    const raw = localStorage.getItem('nnp_profiles');
+    return raw ? JSON.parse(raw) : { ...DEFAULT_PROFILES };
+  } catch { return { ...DEFAULT_PROFILES }; }
 }
 
-// ---- SELEÇÃO DE USUÁRIO ----
-function selectUser(uid) {
-  currentUser = uid;
-  document.body.className = 'user-' + uid;
+function saveProfiles(p) {
+  localStorage.setItem('nnp_profiles', JSON.stringify(p));
+}
 
-  const isD = uid === 'dudu';
-  document.getElementById('header-avatar').textContent = isD ? 'D' : 'T';
-  document.getElementById('header-avatar').className = 'header-avatar ' + (isD ? 'dudu-avatar' : 'thata-avatar');
-  document.getElementById('header-name').textContent = isD ? 'Dudu' : 'Thata';
+// ── ESTADO ────────────────────────────────
+let uid = null;   // 'dudu' | 'thata'
+let shared = { currentBook: null, readChapters: [] };
+let noteView = 'mine';
+let editingUid = null;
+let editEmoji  = null;
 
-  document.getElementById('screen-select').classList.remove('active');
-  document.getElementById('screen-app').classList.add('active');
+// ── INIT ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderWhoScreen();
+  buildBookSelect();
+  buildEmojiGrid();
+  showDailyVerse();
+  randomVerse();
+});
 
-  waitForFirebase(() => {
-    loadAll();
+// ── TELA SELEÇÃO ──────────────────────────
+function renderWhoScreen() {
+  const p = getProfiles();
+  ['dudu','thata'].forEach(id => {
+    document.getElementById('emoji-' + id).textContent = p[id].emoji;
+    document.getElementById('name-' + id).textContent  = p[id].name;
   });
 }
 
-function backToSelect() {
-  currentUser = null;
+function enterUser(id) {
+  uid = id;
+  const p = getProfiles();
+  document.body.className = 'u-' + id;
+
+  // topbar
+  document.getElementById('tb-emoji').textContent = p[id].emoji;
+  document.getElementById('tb-name').textContent  = p[id].name;
+
+  // notas: label do parceiro
+  const partner = id === 'dudu' ? 'thata' : 'dudu';
+  document.getElementById('partner-art').textContent = partner === 'dudu' ? 'e' : 'a';
+  document.getElementById('partner-lbl').textContent = p[partner].name;
+
+  document.getElementById('s-who').classList.remove('active');
+  document.getElementById('s-app').classList.add('active');
+
+  onFBReady(() => {
+    loadShared().then(() => {
+      renderHome();
+      updateTopbar();
+    });
+  });
+}
+
+function goBack() {
+  uid = null;
   document.body.className = '';
-  document.getElementById('screen-app').classList.remove('active');
-  document.getElementById('screen-select').classList.add('active');
+  document.getElementById('s-app').classList.remove('active');
+  document.getElementById('s-who').classList.add('active');
+  renderWhoScreen();
+  // reset nav
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.tab[data-tab="home"]').classList.add('active');
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-home').classList.add('active');
 }
 
-// ---- NAVEGAÇÃO ----
-function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-
-  if (name === 'leitura') renderChapters();
-  if (name === 'notas') { renderMyNotes(); renderPartnerNotes(); renderChat(); }
-  if (name === 'meta') renderMeta();
-  if (name === 'versiculo') renderVerses();
+// ── EDITAR PERFIL ─────────────────────────
+function openEdit(id, e) {
+  e.stopPropagation();
+  editingUid = id;
+  const p = getProfiles();
+  document.getElementById('edit-name').value = p[id].name;
+  editEmoji = p[id].emoji;
+  // marcar emoji selecionado
+  document.querySelectorAll('.emoji-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.e === editEmoji);
+  });
+  document.getElementById('modal-edit').style.display = 'flex';
 }
 
-// ---- CARGA INICIAL ----
-async function loadAll() {
-  await Promise.all([loadSharedState(), loadDailyVerse()]);
-  renderHome();
+function closeEdit() {
+  document.getElementById('modal-edit').style.display = 'none';
+  editingUid = null;
 }
 
-// ---- SHARED STATE (livro + capítulos compartilhados) ----
-let sharedState = { currentBook: null, readChapters: [] };
+function saveEdit() {
+  const name = document.getElementById('edit-name').value.trim();
+  if (!name) return;
+  const p = getProfiles();
+  p[editingUid].name  = name;
+  p[editingUid].emoji = editEmoji || p[editingUid].emoji;
+  saveProfiles(p);
+  closeEdit();
+  renderWhoScreen();
+}
 
-async function loadSharedState() {
+function buildEmojiGrid() {
+  const grid = document.getElementById('emoji-grid');
+  EMOJIS.forEach(em => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-opt';
+    btn.dataset.e = em;
+    btn.textContent = em;
+    btn.type = 'button';
+    btn.onclick = () => {
+      editEmoji = em;
+      document.querySelectorAll('.emoji-opt').forEach(el => el.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ── TABS ──────────────────────────────────
+function goTab(name, btn) {
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  if (name === 'read')  { renderChapters(); }
+  if (name === 'notes') { switchNote('mine'); }
+  if (name === 'verse') { renderVerseList(); }
+  if (name === 'goal')  { renderGoalPage(); }
+}
+
+// ── FIREBASE HELPERS ──────────────────────
+function userCol(u, col) {
+  const { collection } = window._fns;
+  return collection(window._db, 'users', u, col);
+}
+
+function sharedDocRef(...path) {
+  const { doc } = window._fns;
+  return doc(window._db, 'shared', 'couple', ...path);
+}
+
+function sharedColRef(col) {
+  const { collection } = window._fns;
+  return collection(window._db, 'shared', 'couple', col);
+}
+
+// ── SHARED STATE ──────────────────────────
+async function loadShared() {
   try {
-    const fb = window._fb;
-    const d = await fb.getDoc(fb.sharedDoc('state/main'));
-    if (d.exists()) sharedState = d.data();
-  } catch(e) { console.log('Shared state offline, usando local', e); }
-  updateHeaderBook();
+    const { getDoc } = window._fns;
+    const snap = await getDoc(sharedDocRef('state', 'main'));
+    if (snap.exists()) shared = snap.data();
+  } catch(e) { console.warn('Offline, usando estado local'); }
 }
 
-async function saveSharedState() {
+async function saveShared() {
   try {
-    const fb = window._fb;
-    await fb.setDoc(fb.sharedDoc('state/main'), sharedState);
-  } catch(e) { console.error('Erro ao salvar estado:', e); }
+    const { setDoc } = window._fns;
+    await setDoc(sharedDocRef('state', 'main'), shared);
+  } catch(e) { console.error('Erro ao salvar:', e); }
 }
 
-// ---- LIVRO ----
-function populateBookSelect() {
-  const sel = document.getElementById('book-select');
-  if (sel.options.length > 1) return; // já populado
-  let lastT = '';
+// ── TOPBAR ────────────────────────────────
+function updateTopbar() {
+  document.getElementById('tb-book').textContent =
+    shared.currentBook ? '📖 ' + shared.currentBook : 'Nenhum livro';
+  const s = shared[uid + '_streak'] || 0;
+  const el = document.getElementById('tb-streak');
+  document.getElementById('streak-n').textContent = s;
+  el.style.display = s > 0 ? 'flex' : 'none';
+}
+
+// ── LIVROS ────────────────────────────────
+function buildBookSelect() {
+  const sel = document.getElementById('book-sel');
+  let lastG = '';
   BOOKS.forEach(b => {
-    if (b.t !== lastT) {
+    if (b.g !== lastG) {
       const og = document.createElement('optgroup');
-      og.label = b.t === 'AT' ? '— Antigo Testamento —' : '— Novo Testamento —';
+      og.label = b.g === 'AT' ? '— Antigo Testamento' : '— Novo Testamento';
       sel.appendChild(og);
-      lastT = b.t;
+      lastG = b.g;
     }
     const o = document.createElement('option');
-    o.value = b.n; o.textContent = b.n + ' (' + b.c + ' caps)';
+    o.value = b.n;
+    o.textContent = b.n + ' (' + b.c + ')';
     sel.appendChild(o);
   });
-  if (sharedState.currentBook) sel.value = sharedState.currentBook;
 }
 
 function onBookChange() {
-  const v = document.getElementById('book-select').value;
+  const v = document.getElementById('book-sel').value;
   const book = BOOKS.find(b => b.n === v);
-  const meta = document.getElementById('book-meta');
+  const hint = document.getElementById('book-hint');
   if (book) {
-    meta.style.display = 'block';
-    meta.textContent = '📖 ' + book.n + ' · ' + book.c + ' capítulos · ' + book.t;
+    hint.style.display = 'block';
+    hint.textContent = book.n + ' · ' + book.c + ' capítulos · ' + book.g;
   } else {
-    meta.style.display = 'none';
+    hint.style.display = 'none';
   }
 }
 
 async function saveBook() {
-  const v = document.getElementById('book-select').value;
+  const v = document.getElementById('book-sel').value;
   if (!v) return alert('Selecione um livro primeiro!');
-  if (sharedState.currentBook !== v) {
-    if (!confirm('Trocar para "' + v + '"? O progresso de capítulos será zerado.')) return;
-    sharedState.readChapters = [];
+  if (shared.currentBook && shared.currentBook !== v) {
+    if (!confirm('Trocar para "' + v + '"?\nO progresso de capítulos será zerado.')) return;
+    shared.readChapters = [];
   }
-  sharedState.currentBook = v;
-  await saveSharedState();
-  updateHeaderBook();
+  shared.currentBook = v;
+  await saveShared();
+  updateTopbar();
   renderChapters();
   renderHome();
 }
 
-function updateHeaderBook() {
-  const el = document.getElementById('header-book');
-  el.textContent = sharedState.currentBook ? '📖 ' + sharedState.currentBook : 'Nenhum livro selecionado';
-}
-
-// ---- CAPÍTULOS ----
+// ── CAPÍTULOS ─────────────────────────────
 function renderChapters() {
-  populateBookSelect();
-  const sec = document.getElementById('chapters-section');
-  if (!sharedState.currentBook) { sec.style.display = 'none'; return; }
+  if (shared.currentBook) {
+    document.getElementById('book-sel').value = shared.currentBook;
+    onBookChange();
+  }
+  const sec = document.getElementById('chap-section');
+  if (!shared.currentBook) { sec.style.display = 'none'; return; }
   sec.style.display = 'block';
 
-  const book = BOOKS.find(b => b.n === sharedState.currentBook);
-  document.getElementById('ch-book-title').textContent = book.n;
-  document.getElementById('ch-count-label').textContent = book.c + ' caps.';
+  const book = BOOKS.find(b => b.n === shared.currentBook);
+  const read = shared.readChapters || [];
+  const pct  = Math.round((read.length / book.c) * 100);
 
-  const read = sharedState.readChapters || [];
-  const pct = Math.round((read.length / book.c) * 100);
-  document.getElementById('ch-prog').style.width = pct + '%';
-  document.getElementById('ch-pct-label').textContent = read.length + ' de ' + book.c + ' capítulos lidos (' + pct + '%)';
+  document.getElementById('chap-lbl').textContent = book.n + ' · Capítulos';
+  document.getElementById('chap-pct-lbl').textContent = read.length + ' / ' + book.c + ' — ' + pct + '%';
+  document.getElementById('chap-bar').style.width = pct + '%';
 
-  const grid = document.getElementById('chapter-grid');
+  const grid = document.getElementById('chap-grid');
   grid.innerHTML = '';
   for (let i = 1; i <= book.c; i++) {
     const btn = document.createElement('button');
-    btn.className = 'ch-btn' + (read.includes(i) ? ' read' : '');
+    btn.className = 'ch' + (read.includes(i) ? ' done' : '');
     btn.textContent = i;
     btn.onclick = () => toggleChapter(i);
     grid.appendChild(btn);
@@ -201,319 +317,323 @@ function renderChapters() {
 }
 
 async function toggleChapter(ch) {
-  const read = sharedState.readChapters || [];
-  const idx = read.indexOf(ch);
-  const todayKey = 'todayRead_' + new Date().toDateString();
+  const read = shared.readChapters || [];
+  const idx  = read.indexOf(ch);
+  const todayKey = new Date().toDateString();
 
   if (idx === -1) {
     read.push(ch);
-    sharedState.readChapters = read;
-    // streak e todayRead
-    sharedState[currentUser + '_todayRead'] = (sharedState[currentUser + '_todayRead'] || 0) + 1;
-    sharedState[currentUser + '_todayKey'] = todayKey;
-    updateStreak();
+    if (shared[uid + '_todayKey'] !== todayKey) {
+      shared[uid + '_todayKey']  = todayKey;
+      shared[uid + '_todayRead'] = 0;
+    }
+    shared[uid + '_todayRead'] = (shared[uid + '_todayRead'] || 0) + 1;
+    bumpStreak();
   } else {
     read.splice(idx, 1);
-    sharedState.readChapters = read;
-    const tr = sharedState[currentUser + '_todayRead'] || 0;
-    if (tr > 0) sharedState[currentUser + '_todayRead'] = tr - 1;
+    shared[uid + '_todayRead'] = Math.max(0, (shared[uid + '_todayRead'] || 0) - 1);
   }
 
-  await saveSharedState();
+  shared.readChapters = read;
+  await saveShared();
   renderChapters();
   renderHome();
-  renderMeta();
-  updateHeaderBook();
+  updateTopbar();
 }
 
-function updateStreak() {
+function bumpStreak() {
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
-  const key = currentUser + '_lastStreak';
-  const strKey = currentUser + '_streak';
-
-  if (sharedState[key] === yesterday) {
-    sharedState[strKey] = (sharedState[strKey] || 0) + 1;
-  } else if (sharedState[key] !== today) {
-    sharedState[strKey] = 1;
+  const lastKey = uid + '_lastStreakDay';
+  const strKey  = uid + '_streak';
+  if (shared[lastKey] === yesterday) {
+    shared[strKey] = (shared[strKey] || 0) + 1;
+  } else if (shared[lastKey] !== today) {
+    shared[strKey] = 1;
   }
-  sharedState[key] = today;
-
-  const s = sharedState[strKey] || 0;
-  document.getElementById('streak-count').textContent = s;
-  document.getElementById('header-streak').style.display = s > 0 ? '' : 'none';
+  shared[lastKey] = today;
 }
 
-// ---- NOTAS ----
-async function saveNote() {
-  const ch = document.getElementById('note-ch').value;
-  const vs = document.getElementById('note-vs').value;
-  const txt = document.getElementById('note-text').value.trim();
-  if (!txt) return alert('Digite uma anotação primeiro!');
+// ── NOTAS ─────────────────────────────────
+function switchNote(view) {
+  noteView = view;
+  ['mine','partner','together'].forEach(v => {
+    document.getElementById('nv-' + v).style.display = v === view ? 'block' : 'none';
+    document.getElementById('nt-' + v).classList.toggle('active', v === view);
+  });
+  if (view === 'mine')     renderMyNotes();
+  if (view === 'partner')  renderPartnerNotes();
+  if (view === 'together') renderTogether();
+}
 
+async function saveNote() {
+  const ch   = document.getElementById('n-ch').value.trim();
+  const vs   = document.getElementById('n-vs').value.trim();
+  const text = document.getElementById('n-text').value.trim();
+  if (!text) return alert('Escreva sua anotação!');
+
+  const p = getProfiles();
   const note = {
-    who: currentUser,
-    ch: ch || null,
-    vs: vs || null,
-    text: txt,
-    book: sharedState.currentBook || null,
-    date: new Date().toLocaleDateString('pt-BR'),
+    who:       uid,
+    name:      p[uid].name,
+    emoji:     p[uid].emoji,
+    ch:        ch || null,
+    vs:        vs || null,
+    text,
+    book:      shared.currentBook || null,
+    date:      new Date().toLocaleDateString('pt-BR'),
     createdAt: Date.now()
   };
 
   try {
-    const fb = window._fb;
-    await fb.addDoc(fb.colRef(currentUser, 'notes'), note);
-  } catch(e) { console.error('Erro ao salvar nota:', e); }
+    const { addDoc } = window._fns;
+    await addDoc(userCol(uid, 'notes'), note);
+  } catch(e) { console.error(e); }
 
-  document.getElementById('note-text').value = '';
-  document.getElementById('note-ch').value = '';
-  document.getElementById('note-vs').value = '';
+  document.getElementById('n-text').value = '';
+  document.getElementById('n-ch').value   = '';
+  document.getElementById('n-vs').value   = '';
   renderMyNotes();
-  renderMeta();
 }
 
-async function loadNotes(uid) {
+async function getNotes(u) {
   try {
-    const fb = window._fb;
-    const snap = await fb.getDocs(fb.colRef(uid, 'notes'));
-    return snap.docs.map(d => d.data()).sort((a,b) => b.createdAt - a.createdAt);
-  } catch(e) { return []; }
+    const { getDocs } = window._fns;
+    const snap = await getDocs(userCol(u, 'notes'));
+    return snap.docs.map(d => d.data()).sort((a, b) => b.createdAt - a.createdAt);
+  } catch { return []; }
+}
+
+function noteCardHTML(n, isPartner) {
+  const ref = n.ch || n.vs
+    ? `<div class="note-ref">${n.ch ? 'Cap. ' + n.ch : ''}${n.vs ? ' : ' + n.vs : ''}</div>`
+    : '';
+  return `
+    <div class="note-card">
+      <div class="note-top">
+        <span class="note-who">${n.emoji || ''} ${n.name || (n.who === 'dudu' ? 'Dudu' : 'Thata')}${n.book ? ' · ' + n.book : ''}</span>
+        <span class="note-date">${n.date}</span>
+      </div>
+      ${ref}
+      <div class="note-body">${n.text}</div>
+    </div>`;
 }
 
 async function renderMyNotes() {
-  const notes = await loadNotes(currentUser);
-  const list = document.getElementById('my-notes-list');
-  if (!notes.length) { list.innerHTML = '<div class="empty-state">Nenhuma anotação ainda...<br>Registre o que o Senhor falar com você ✨</div>'; return; }
-  const tag = currentUser === 'dudu' ? 'note-tag-dudu' : 'note-tag-thata';
-  const lbl = currentUser === 'dudu' ? 'Dudu' : 'Thata';
-  list.innerHTML = notes.map(n => `
-    <div class="note-card">
-      <div class="note-card-header">
-        <span class="note-tag ${tag}">${lbl}${n.book ? ' · ' + n.book : ''}</span>
-        <span class="note-date">${n.date}</span>
-      </div>
-      ${n.ch || n.vs ? `<div class="note-ref">${n.ch ? 'Cap. ' + n.ch : ''}${n.vs ? ':' + n.vs : ''}</div>` : ''}
-      <div class="note-text">${n.text}</div>
-    </div>`).join('');
+  const notes = await getNotes(uid);
+  const el = document.getElementById('mine-list');
+  if (!notes.length) {
+    el.innerHTML = '<div class="block-empty center" style="margin-top:8px">Nenhuma anotação ainda ✨</div>';
+    return;
+  }
+  el.innerHTML = notes.map(n => noteCardHTML(n, false)).join('');
 }
 
 async function renderPartnerNotes() {
-  const partner = currentUser === 'dudu' ? 'thata' : 'dudu';
-  const partnerName = partner === 'dudu' ? 'Dudu' : 'Thata';
-  const tag = partner === 'dudu' ? 'note-tag-dudu' : 'note-tag-thata';
-  const colorVar = partner === 'dudu' ? 'var(--dudu-bg)' : 'var(--thata-bg)';
-  const borderVar = partner === 'dudu' ? 'var(--dudu-border)' : 'var(--thata-border)';
-  const colorText = partner === 'dudu' ? 'var(--dudu2)' : 'var(--thata2)';
+  const partner = uid === 'dudu' ? 'thata' : 'dudu';
+  const p = getProfiles();
+  const partnerName = p[partner].name;
+  const partnerEmoji = p[partner].emoji;
 
-  // atualiza label
-  document.getElementById('nt-parceiro-label').textContent = partner === 'dudu' ? 'e' : 'a'; // dele/dela
+  document.getElementById('partner-header').innerHTML =
+    `${partnerEmoji} <strong>${partnerName}</strong> — somente leitura 👀`;
 
-  const banner = document.getElementById('partner-banner');
-  banner.style.cssText = `background:${colorVar};border:1px solid ${borderVar};color:${colorText};`;
-  banner.innerHTML = `<strong>Notas de ${partnerName}</strong> — leitura somente 👀`;
-
-  const notes = await loadNotes(partner);
-  const list = document.getElementById('partner-notes-list');
-  if (!notes.length) { list.innerHTML = `<div class="empty-state">${partnerName} ainda não escreveu nada 📝</div>`; return; }
-  list.innerHTML = notes.map(n => `
-    <div class="note-card">
-      <div class="note-card-header">
-        <span class="note-tag ${tag}">${partnerName}${n.book ? ' · ' + n.book : ''}</span>
-        <span class="note-date">${n.date}</span>
-      </div>
-      ${n.ch || n.vs ? `<div class="note-ref">${n.ch ? 'Cap. ' + n.ch : ''}${n.vs ? ':' + n.vs : ''}</div>` : ''}
-      <div class="note-text">${n.text}</div>
-    </div>`).join('');
+  const notes = await getNotes(partner);
+  const el = document.getElementById('partner-list');
+  if (!notes.length) {
+    el.innerHTML = `<div class="block-empty center" style="margin-top:8px">${partnerName} ainda não escreveu nada</div>`;
+    return;
+  }
+  el.innerHTML = notes.map(n => noteCardHTML(n, true)).join('');
 }
 
-// ---- INTERAÇÕES (JUNTOS) ----
-async function sendInteraction() {
-  const txt = document.getElementById('chat-msg').value.trim();
-  if (!txt) return;
+// ── TOGETHER / CHAT ───────────────────────
+async function sendMsg() {
+  const text = document.getElementById('together-txt').value.trim();
+  if (!text) return;
+  const p = getProfiles();
   const msg = {
-    who: currentUser,
-    text: txt,
-    date: new Date().toLocaleDateString('pt-BR'),
+    who:       uid,
+    name:      p[uid].name,
+    emoji:     p[uid].emoji,
+    text,
+    date:      new Date().toLocaleDateString('pt-BR'),
     createdAt: Date.now()
   };
   try {
-    const fb = window._fb;
-    await fb.addDoc(fb.sharedRef('interactions'), msg);
-  } catch(e) { console.error('Erro ao enviar:', e); }
-  document.getElementById('chat-msg').value = '';
-  renderChat();
+    const { addDoc } = window._fns;
+    await addDoc(sharedColRef('interactions'), msg);
+  } catch(e) { console.error(e); }
+  document.getElementById('together-txt').value = '';
+  renderTogether();
   renderHome();
 }
 
-async function loadInteractions() {
+async function getInteractions() {
   try {
-    const fb = window._fb;
-    const snap = await fb.getDocs(fb.sharedRef('interactions'));
-    return snap.docs.map(d => d.data()).sort((a,b) => a.createdAt - b.createdAt);
-  } catch(e) { return []; }
+    const { getDocs } = window._fns;
+    const snap = await getDocs(sharedColRef('interactions'));
+    return snap.docs.map(d => d.data()).sort((a, b) => a.createdAt - b.createdAt);
+  } catch { return []; }
 }
 
-async function renderChat() {
-  const msgs = await loadInteractions();
-  const wrap = document.getElementById('chat-wrap');
-  if (!msgs.length) { wrap.innerHTML = '<div class="empty-state">Comecem a conversar aqui! 💑</div>'; return; }
-  wrap.innerHTML = msgs.map(m => `
-    <div class="chat-bubble ${m.who}">
-      <div class="bubble-from">${m.who === 'dudu' ? 'Dudu' : 'Thata'}</div>
-      ${m.text}
-      <div class="bubble-date">${m.date}</div>
-    </div>`).join('');
+async function renderTogether() {
+  const msgs = await getInteractions();
+  const wrap = document.getElementById('together-msgs');
+  if (!msgs.length) {
+    wrap.innerHTML = '<div class="block-empty center">Comecem a conversar aqui! ♡</div>';
+    return;
+  }
+  wrap.innerHTML = msgs.map(m => {
+    const isMine = m.who === uid;
+    return `
+      <div class="t-bubble ${isMine ? 'mine' : 'theirs'}">
+        <div class="t-from">${m.emoji || ''} ${m.name || m.who}</div>
+        ${m.text}
+        <div class="t-date">${m.date}</div>
+      </div>`;
+  }).join('');
   wrap.scrollTop = wrap.scrollHeight;
 }
 
-// ---- NOTAS VIEW SWITCH ----
-function switchNoteView(view) {
-  noteView = view;
-  ['minhas','parceiro','juntos'].forEach(v => {
-    const el = document.getElementById('notesview-' + v);
-    const btn = document.getElementById('nt-' + v);
-    if (el) el.style.display = v === view ? 'block' : 'none';
-    if (btn) btn.classList.toggle('active', v === view);
-  });
-  if (view === 'parceiro') renderPartnerNotes();
-  if (view === 'juntos') renderChat();
+// ── VERSÍCULO ─────────────────────────────
+function showDailyVerse() {
+  const v = VERSES[new Date().getDate() % VERSES.length];
+  document.getElementById('hb-text').textContent = v.t;
+  document.getElementById('hb-ref').textContent  = v.r;
 }
 
-// ---- VERSÍCULO ----
-function loadDailyVerse() {
-  const idx = new Date().getDate() % VERSES.length;
-  const v = VERSES[idx];
-  document.getElementById('daily-verse-text').textContent = v.t;
-  document.getElementById('daily-verse-ref').textContent = v.r;
-}
-
-function loadRandomVerse() {
-  const idx = Math.floor(Math.random() * VERSES.length);
-  const v = VERSES[idx];
-  document.getElementById('rema-text').textContent = v.t;
-  document.getElementById('rema-ref').textContent = v.r;
+function randomVerse() {
+  const v = VERSES[Math.floor(Math.random() * VERSES.length)];
+  document.getElementById('vb-text').textContent = v.t;
+  document.getElementById('vb-ref').textContent  = v.r;
 }
 
 async function saveVerse() {
-  const t = document.getElementById('v-text').value.trim();
-  const r = document.getElementById('v-ref').value.trim();
-  if (!t) return alert('Digite o versículo!');
-  const verse = { who: currentUser, text: t, ref: r, date: new Date().toLocaleDateString('pt-BR'), createdAt: Date.now() };
+  const text = document.getElementById('v-text').value.trim();
+  const ref  = document.getElementById('v-ref').value.trim();
+  if (!text) return alert('Digite o versículo!');
+
+  const v = {
+    text, ref,
+    date:      new Date().toLocaleDateString('pt-BR'),
+    createdAt: Date.now()
+  };
   try {
-    const fb = window._fb;
-    await fb.addDoc(fb.colRef(currentUser, 'verses'), verse);
-  } catch(e) { console.error('Erro ao salvar versículo:', e); }
+    const { addDoc } = window._fns;
+    await addDoc(userCol(uid, 'verses'), v);
+  } catch(e) { console.error(e); }
   document.getElementById('v-text').value = '';
-  document.getElementById('v-ref').value = '';
-  renderVerses();
-  renderMeta();
+  document.getElementById('v-ref').value  = '';
+  renderVerseList();
 }
 
-async function renderVerses() {
+async function renderVerseList() {
   try {
-    const fb = window._fb;
-    const snap = await fb.getDocs(fb.colRef(currentUser, 'verses'));
-    const list = snap.docs.map(d => d.data()).sort((a,b) => b.createdAt - a.createdAt);
-    const el = document.getElementById('verses-list');
-    if (!list.length) { el.innerHTML = '<div class="empty-state">Nenhum versículo salvo ainda 🌿</div>'; return; }
+    const { getDocs } = window._fns;
+    const snap = await getDocs(userCol(uid, 'verses'));
+    const list = snap.docs.map(d => d.data()).sort((a, b) => b.createdAt - a.createdAt);
+    const el = document.getElementById('verse-list');
+    if (!list.length) {
+      el.innerHTML = '<div class="block-empty center">Nenhum versículo salvo ainda 🌿</div>';
+      return;
+    }
     el.innerHTML = list.map(v => `
       <div class="verse-card">
         <div class="verse-card-text">${v.text}</div>
-        <div class="verse-card-ref">${v.ref || 'Versículo salvo'}</div>
+        ${v.ref ? `<div class="verse-card-ref">${v.ref}</div>` : ''}
         <div class="verse-card-date">${v.date}</div>
       </div>`).join('');
   } catch(e) { console.error(e); }
 }
 
-// ---- HOME ----
+// ── HOME ──────────────────────────────────
 async function renderHome() {
-  // Progresso do livro
-  const bCard = document.getElementById('home-book-card');
-  if (sharedState.currentBook) {
-    const book = BOOKS.find(b => b.n === sharedState.currentBook);
-    const read = (sharedState.readChapters || []).length;
-    const pct = Math.round((read / book.c) * 100);
-    bCard.innerHTML = `
-      <div class="bpc-title">${book.n}</div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
-      <div class="bpc-sub">${read} de ${book.c} capítulos · ${pct}%</div>`;
+  // Livro
+  const bEl = document.getElementById('home-book');
+  if (shared.currentBook) {
+    const book = BOOKS.find(b => b.n === shared.currentBook);
+    const read = (shared.readChapters || []).length;
+    const pct  = Math.round((read / book.c) * 100);
+    bEl.innerHTML = `
+      <div style="font-size:16px;font-weight:600;color:var(--t0);margin-bottom:10px">${book.n}</div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:var(--t2);margin-top:8px">${read} de ${book.c} capítulos · ${pct}%</div>`;
   } else {
-    bCard.innerHTML = '<div class="bpc-empty">Selecione um livro na aba Leitura 📚</div>';
+    bEl.innerHTML = '<div class="block-empty">Selecione um livro na aba Leitura</div>';
   }
 
   // Meta
   const today = new Date();
-  const isWE = today.getDay() === 0 || today.getDay() === 6;
-  const metaGoal = isWE ? 5 : 3;
-  const todayRead = sharedState[currentUser + '_todayRead'] || 0;
-  const pct = Math.min(100, Math.round((todayRead / metaGoal) * 100));
-  document.getElementById('meta-day-label').textContent = (isWE ? 'Final de semana' : 'Dia de semana') + ' · Meta: ' + metaGoal + ' caps';
-  document.getElementById('meta-badge').textContent = todayRead + '/' + metaGoal;
-  document.getElementById('home-prog').style.width = pct + '%';
-  document.getElementById('meta-hint-text').textContent = pct >= 100 ? '🎉 Meta cumprida hoje! Glória a Deus!' : (metaGoal - todayRead) + ' capítulos restantes para hoje';
+  const isWE  = today.getDay() === 0 || today.getDay() === 6;
+  const goal  = isWE ? 5 : 3;
+  const done  = shared[uid + '_todayRead'] || 0;
+  const pct   = Math.min(100, Math.round((done / goal) * 100));
+  const label = isWE ? 'Final de semana' : 'Dia de semana';
 
-  // Streak
-  const s = sharedState[currentUser + '_streak'] || 0;
-  document.getElementById('streak-count').textContent = s;
+  document.getElementById('hg-desc').textContent = label + ' · meta: ' + goal;
+  document.getElementById('hg-chip').textContent = done + '/' + goal;
+  document.getElementById('hg-bar').style.width  = pct + '%';
+  document.getElementById('hg-hint').textContent = pct >= 100
+    ? '🎉 Meta cumprida! Glória a Deus!'
+    : (goal - done) + ' capítulo(s) restante(s) hoje';
 
   // Interações
-  const msgs = await loadInteractions();
-  const el = document.getElementById('home-interactions');
+  const msgs = await getInteractions();
+  const el   = document.getElementById('home-msgs');
   const last3 = msgs.slice(-3).reverse();
-  if (!last3.length) { el.innerHTML = '<div class="empty-state">Nenhuma interação ainda 💑</div>'; return; }
+  if (!last3.length) {
+    el.innerHTML = '<div class="block-empty center">Nenhuma mensagem ainda</div>';
+    return;
+  }
   el.innerHTML = last3.map(m => `
-    <div class="home-msg ${m.who}">
-      <div class="home-msg-from">${m.who === 'dudu' ? 'Dudu' : 'Thata'} · ${m.date}</div>
-      ${m.text}
+    <div class="msg-bubble">
+      <div class="msg-from">${m.emoji || ''} ${m.name || m.who}</div>
+      <div class="msg-text">${m.text}</div>
+      <div class="msg-date">${m.date}</div>
     </div>`).join('');
 }
 
-// ---- META PAGE ----
-async function renderMeta() {
-  // Stats
-  const read = (sharedState.readChapters || []).length;
-  const streak = sharedState[currentUser + '_streak'] || 0;
-  document.getElementById('st-caps').textContent = read;
-  document.getElementById('st-streak').textContent = streak;
-  document.getElementById('meta-streak-num').textContent = streak;
+// ── META PAGE ─────────────────────────────
+async function renderGoalPage() {
+  const read = (shared.readChapters || []).length;
+  const streak = shared[uid + '_streak'] || 0;
+  document.getElementById('sg-caps').textContent   = read;
+  document.getElementById('sg-streak').textContent = streak;
 
   try {
-    const fb = window._fb;
-    const [notesSnap, versesSnap] = await Promise.all([
-      fb.getDocs(fb.colRef(currentUser, 'notes')),
-      fb.getDocs(fb.colRef(currentUser, 'verses'))
+    const { getDocs } = window._fns;
+    const [ns, vs] = await Promise.all([
+      getDocs(userCol(uid, 'notes')),
+      getDocs(userCol(uid, 'verses'))
     ]);
-    document.getElementById('st-notes').textContent = notesSnap.size;
-    document.getElementById('st-verses').textContent = versesSnap.size;
-  } catch(e) {}
+    document.getElementById('sg-notes').textContent  = ns.size;
+    document.getElementById('sg-verses').textContent = vs.size;
+  } catch {}
 
   const today = new Date();
-  const isWE = today.getDay() === 0 || today.getDay() === 6;
-  const goal = isWE ? 5 : 3;
-  const done = sharedState[currentUser + '_todayRead'] || 0;
-  const pct = Math.min(100, Math.round((done / goal) * 100));
-  document.getElementById('meta-goal-label').textContent = (isWE ? 'Final de semana' : 'Dia de semana') + ' — meta de ' + goal + ' capítulos';
-  document.getElementById('meta-prog').style.width = pct + '%';
-  document.getElementById('meta-prog-label').textContent = done + ' de ' + goal + ' capítulos lidos hoje (' + pct + '%)';
+  const isWE  = today.getDay() === 0 || today.getDay() === 6;
+  const goal  = isWE ? 5 : 3;
+  const done  = shared[uid + '_todayRead'] || 0;
+  const pct   = Math.min(100, Math.round((done / goal) * 100));
 
-  // Progresso do livro
-  const bEl = document.getElementById('meta-book-prog');
-  if (sharedState.currentBook) {
-    const book = BOOKS.find(b => b.n === sharedState.currentBook);
-    const readCh = (sharedState.readChapters || []).length;
-    const pctB = Math.round((readCh / book.c) * 100);
+  document.getElementById('gg-desc').textContent = (isWE ? 'Final de semana' : 'Dia de semana') + ' · ' + goal + ' caps';
+  document.getElementById('gg-chip').textContent = done + '/' + goal;
+  document.getElementById('gg-bar').style.width  = pct + '%';
+  document.getElementById('gg-hint').textContent = pct >= 100
+    ? '🎉 Meta cumprida! Glória a Deus!'
+    : (goal - done) + ' capítulo(s) restante(s)';
+
+  const bEl = document.getElementById('goal-book');
+  if (shared.currentBook) {
+    const book = BOOKS.find(b => b.n === shared.currentBook);
+    const readCh = (shared.readChapters || []).length;
+    const pctB   = Math.round((readCh / book.c) * 100);
     bEl.innerHTML = `
-      <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--fg0);margin-bottom:10px">${book.n}</div>
-      <div class="prog-bar" style="height:12px"><div class="prog-fill" style="width:${pctB}%"></div></div>
-      <p style="font-size:12px;color:var(--fg2);margin-top:8px">${readCh} de ${book.c} capítulos · ${pctB}%</p>`;
+      <div class="book-prog-title">${book.n}</div>
+      <div class="bar" style="height:10px"><div class="bar-fill" style="width:${pctB}%"></div></div>
+      <div class="book-prog-sub">${readCh} de ${book.c} capítulos · ${pctB}%</div>`;
   } else {
-    bEl.innerHTML = '<div class="empty-state">Nenhum livro selecionado</div>';
+    bEl.innerHTML = '<div class="block-empty">Nenhum livro selecionado</div>';
   }
 }
-
-// ---- INIT ----
-document.addEventListener('DOMContentLoaded', () => {
-  loadDailyVerse();
-  loadRandomVerse();
-});

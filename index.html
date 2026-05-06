@@ -2,288 +2,298 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0a">
   <title>Nós na Palavra</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- TELA DE SELEÇÃO DE USUÁRIO -->
-  <div id="screen-select" class="screen active">
-    <div class="select-bg">
-      <div class="cross-decor">✝</div>
+<!-- ═══════════════════════════════════
+     TELA 1 — QUEM ESTÁ ACESSANDO
+     ═══════════════════════════════════ -->
+<div id="s-who" class="screen active">
+  <div class="who-wrap">
+    <div class="who-logo">
+      <span class="who-logo-mark">✦</span>
+      <h1>Nós na Palavra</h1>
     </div>
-    <div class="select-content">
-      <div class="app-logo">
-        <span class="logo-icon">✦</span>
-        <h1>Nós na Palavra</h1>
-        <p>Leitura bíblica a dois</p>
-      </div>
-      <p class="select-prompt">Quem está acessando?</p>
-      <div class="user-cards">
-        <button class="user-card dudu" onclick="selectUser('dudu')">
-          <div class="user-avatar dudu-avatar">D</div>
-          <div class="user-name">Dudu</div>
-          <div class="user-sub">Área do marido</div>
-          <div class="user-arrow">→</div>
-        </button>
-        <button class="user-card thata" onclick="selectUser('thata')">
-          <div class="user-avatar thata-avatar">T</div>
-          <div class="user-name">Thata</div>
-          <div class="user-sub">Área da esposa</div>
-          <div class="user-arrow">→</div>
-        </button>
-      </div>
-      <p class="select-verse">"Dois são melhor do que um" — Eclesiastes 4:9</p>
+    <p class="who-question">Quem está acessando?</p>
+    <div class="who-cards">
+      <button class="who-card" id="card-dudu" onclick="enterUser('dudu')">
+        <span class="who-emoji" id="emoji-dudu">📖</span>
+        <span class="who-name" id="name-dudu">Dudu</span>
+        <span class="who-edit" onclick="openEdit('dudu', event)">✎</span>
+      </button>
+      <button class="who-card" id="card-thata" onclick="enterUser('thata')">
+        <span class="who-emoji" id="emoji-thata">🌸</span>
+        <span class="who-name" id="name-thata">Thata</span>
+        <span class="who-edit" onclick="openEdit('thata', event)">✎</span>
+      </button>
+    </div>
+    <p class="who-verse">"Dois são melhor do que um" · Ecl 4:9</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODAL — EDITAR PERFIL
+     ═══════════════════════════════════ -->
+<div id="modal-edit" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">Personalizar perfil</div>
+    <label class="modal-label">Nome</label>
+    <input type="text" class="modal-input" id="edit-name" maxlength="20" placeholder="Seu nome">
+    <label class="modal-label">Escolha um emoji</label>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEdit()">Cancelar</button>
+      <button class="modal-save" onclick="saveEdit()">Salvar</button>
     </div>
   </div>
+</div>
 
-  <!-- APP PRINCIPAL -->
-  <div id="screen-app" class="screen">
+<!-- ═══════════════════════════════════
+     TELA 2 — APP PRINCIPAL
+     ═══════════════════════════════════ -->
+<div id="s-app" class="screen">
 
-    <!-- HEADER -->
-    <header id="app-header">
-      <button class="back-btn" onclick="backToSelect()">←</button>
-      <div class="header-center">
-        <div class="header-avatar" id="header-avatar"></div>
-        <div>
-          <div class="header-name" id="header-name"></div>
-          <div class="header-book" id="header-book">Nenhum livro selecionado</div>
-        </div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">‹</button>
+    <div class="topbar-user">
+      <span class="topbar-emoji" id="tb-emoji"></span>
+      <div>
+        <div class="topbar-name" id="tb-name"></div>
+        <div class="topbar-book" id="tb-book">Nenhum livro</div>
       </div>
-      <div class="header-streak" id="header-streak" title="Dias seguidos">🔥 <span id="streak-count">0</span></div>
-    </header>
-
-    <!-- NAV -->
-    <nav id="app-nav">
-      <button class="nav-btn active" data-page="home" onclick="showPage('home',this)">
-        <span class="nav-icon">⌂</span><span class="nav-label">Início</span>
-      </button>
-      <button class="nav-btn" data-page="leitura" onclick="showPage('leitura',this)">
-        <span class="nav-icon">✦</span><span class="nav-label">Leitura</span>
-      </button>
-      <button class="nav-btn" data-page="notas" onclick="showPage('notas',this)">
-        <span class="nav-icon">✎</span><span class="nav-label">Notas</span>
-      </button>
-      <button class="nav-btn" data-page="versiculo" onclick="showPage('versiculo',this)">
-        <span class="nav-icon">☩</span><span class="nav-label">Versículo</span>
-      </button>
-      <button class="nav-btn" data-page="meta" onclick="showPage('meta',this)">
-        <span class="nav-icon">◎</span><span class="nav-label">Meta</span>
-      </button>
-    </nav>
-
-    <!-- PAGES -->
-    <main id="app-main">
-
-      <!-- HOME -->
-      <div id="page-home" class="page active">
-        <div class="verse-hero" id="home-verse-hero">
-          <div class="verse-ornament">✦</div>
-          <p class="verse-hero-text" id="daily-verse-text">Carregando...</p>
-          <p class="verse-hero-ref" id="daily-verse-ref"></p>
-        </div>
-
-        <div class="section-title">Livro atual</div>
-        <div class="book-progress-card" id="home-book-card">
-          <div class="bpc-empty">Selecione um livro na aba Leitura 📚</div>
-        </div>
-
-        <div class="section-title">Meta de hoje</div>
-        <div class="meta-card" id="home-meta-card">
-          <div class="meta-row">
-            <span class="meta-label" id="meta-day-label">Carregando...</span>
-            <span class="meta-badge" id="meta-badge">0/0</span>
-          </div>
-          <div class="prog-bar"><div class="prog-fill" id="home-prog"></div></div>
-          <p class="meta-hint" id="meta-hint-text"></p>
-        </div>
-
-        <div class="section-title">Interações recentes</div>
-        <div id="home-interactions">
-          <div class="empty-state">Nenhuma interação ainda 💑</div>
-        </div>
-      </div>
-
-      <!-- LEITURA -->
-      <div id="page-leitura" class="page">
-        <div class="section-title">Selecionar livro</div>
-        <div class="card">
-          <label class="field-label">Livro da Bíblia</label>
-          <select id="book-select" class="field-select" onchange="onBookChange()">
-            <option value="">— Escolha um livro —</option>
-          </select>
-          <div class="book-meta" id="book-meta" style="display:none"></div>
-          <button class="btn-primary" onclick="saveBook()">Salvar como livro atual</button>
-        </div>
-
-        <div id="chapters-section" style="display:none">
-          <div class="section-title">Capítulos</div>
-          <div class="card">
-            <div class="ch-header">
-              <span class="ch-title" id="ch-book-title"></span>
-              <span class="ch-count" id="ch-count-label"></span>
-            </div>
-            <div class="prog-bar" style="margin: 10px 0 6px"><div class="prog-fill" id="ch-prog"></div></div>
-            <p class="ch-pct" id="ch-pct-label"></p>
-            <div class="chapter-grid" id="chapter-grid"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- NOTAS -->
-      <div id="page-notas" class="page">
-        <div class="notes-tabs">
-          <button class="notes-tab active" id="nt-minhas" onclick="switchNoteView('minhas')">Minhas notas</button>
-          <button class="notes-tab" id="nt-parceiro" onclick="switchNoteView('parceiro')">Notas d<span id="nt-parceiro-label">ele/a</span></button>
-          <button class="notes-tab" id="nt-juntos" onclick="switchNoteView('juntos')">💑 Juntos</button>
-        </div>
-
-        <!-- MINHAS -->
-        <div id="notesview-minhas">
-          <div class="card" style="margin-top:0">
-            <label class="field-label">Nova anotação</label>
-            <div class="ref-row">
-              <div style="flex:1">
-                <label class="field-label" style="font-size:10px">Capítulo</label>
-                <input type="number" class="field-input" id="note-ch" placeholder="Cap.">
-              </div>
-              <div style="flex:1">
-                <label class="field-label" style="font-size:10px">Versículo</label>
-                <input type="text" class="field-input" id="note-vs" placeholder="Vs.">
-              </div>
-            </div>
-            <textarea class="field-textarea" id="note-text" placeholder="O que o Senhor falou com você hoje..."></textarea>
-            <button class="btn-primary" onclick="saveNote()">Salvar anotação</button>
-          </div>
-          <div id="my-notes-list"></div>
-        </div>
-
-        <!-- PARCEIRO -->
-        <div id="notesview-parceiro" style="display:none">
-          <div class="partner-banner" id="partner-banner"></div>
-          <div id="partner-notes-list"></div>
-        </div>
-
-        <!-- JUNTOS -->
-        <div id="notesview-juntos" style="display:none">
-          <div class="chat-wrap" id="chat-wrap"></div>
-          <div class="chat-input-area">
-            <textarea class="chat-textarea" id="chat-msg" placeholder="Compartilhe uma reflexão, pergunta..."></textarea>
-            <button class="chat-send" onclick="sendInteraction()">Enviar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- VERSÍCULO -->
-      <div id="page-versiculo" class="page">
-        <div class="verse-hero" style="margin-bottom:16px">
-          <div class="verse-ornament">☩</div>
-          <p class="verse-hero-text" id="rema-text">Clique em novo versículo para buscar inspiração</p>
-          <p class="verse-hero-ref" id="rema-ref"></p>
-          <button class="btn-outline" onclick="loadRandomVerse()">Novo versículo ↻</button>
-        </div>
-
-        <div class="section-title">Registrar versículo rema</div>
-        <div class="card">
-          <label class="field-label">Versículo que tocou seu coração</label>
-          <textarea class="field-textarea" id="v-text" placeholder="Digite o versículo..."></textarea>
-          <label class="field-label">Referência (ex: João 3:16)</label>
-          <input type="text" class="field-input" id="v-ref" placeholder="Livro Capítulo:Versículo">
-          <button class="btn-primary" onclick="saveVerse()">Salvar versículo</button>
-        </div>
-
-        <div class="section-title">Versículos salvos</div>
-        <div id="verses-list"></div>
-      </div>
-
-      <!-- META -->
-      <div id="page-meta" class="page">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-num" id="st-caps">0</div>
-            <div class="stat-lbl">Caps. lidos</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="st-streak">0</div>
-            <div class="stat-lbl">Dias seguidos</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="st-notes">0</div>
-            <div class="stat-lbl">Anotações</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="st-verses">0</div>
-            <div class="stat-lbl">Versículos</div>
-          </div>
-        </div>
-
-        <div class="section-title">Regras de meta</div>
-        <div class="card rules-card">
-          <div class="rule-row">
-            <div class="rule-icon">📅</div>
-            <div><strong>Dias de semana</strong><br><span class="rule-sub">3 capítulos por dia</span></div>
-          </div>
-          <div class="rule-divider"></div>
-          <div class="rule-row">
-            <div class="rule-icon">🎉</div>
-            <div><strong>Final de semana</strong><br><span class="rule-sub">5 capítulos por dia</span></div>
-          </div>
-        </div>
-
-        <div class="section-title">Meta de hoje</div>
-        <div class="card">
-          <div class="meta-row" style="margin-bottom:10px">
-            <span id="meta-goal-label" style="font-size:14px;color:var(--fg2)"></span>
-            <span class="streak-pill">🔥 <span id="meta-streak-num">0</span> dias</span>
-          </div>
-          <div class="prog-bar" style="height:16px"><div class="prog-fill" id="meta-prog"></div></div>
-          <p style="font-size:12px;color:var(--fg3);margin-top:6px" id="meta-prog-label"></p>
-        </div>
-
-        <div class="section-title">Progresso do livro</div>
-        <div class="card" id="meta-book-prog">
-          <div class="empty-state">Nenhum livro selecionado</div>
-        </div>
-      </div>
-
-    </main>
+    </div>
+    <div class="topbar-streak" id="tb-streak" style="display:none">🔥<span id="streak-n">0</span></div>
   </div>
 
-  <!-- FIREBASE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="home" onclick="goTab('home',this)">Início</button>
+    <button class="tab" data-tab="read" onclick="goTab('read',this)">Leitura</button>
+    <button class="tab" data-tab="notes" onclick="goTab('notes',this)">Notas</button>
+    <button class="tab" data-tab="verse" onclick="goTab('verse',this)">Versículo</button>
+    <button class="tab" data-tab="goal" onclick="goTab('goal',this)">Meta</button>
+  </div>
 
-    // ============================================
-    // 🔧 CONFIGURAÇÃO FIREBASE — substitua abaixo
-    // ============================================
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJETO_ID",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-    // ============================================
+  <!-- CONTENT -->
+  <div class="content" id="content">
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window._db = db;
+    <!-- ── HOME ── -->
+    <div id="tab-home" class="tabpanel active">
 
-    // Expõe helpers globais
-    window._fb = {
-      doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot,
-      userRef: (uid, path) => path ? doc(db, 'users', uid, ...path.split('/')) : doc(db, 'users', uid),
-      colRef: (uid, col) => collection(db, 'users', uid, col),
-      sharedRef: (col) => collection(db, 'shared', 'couple', col),
-      sharedDoc: (path) => doc(db, 'shared', 'couple', ...path.split('/'))
-    };
-  </script>
+      <div class="verse-banner" id="home-banner">
+        <span class="verse-banner-ornament">✦</span>
+        <p class="verse-banner-text" id="hb-text">…</p>
+        <p class="verse-banner-ref" id="hb-ref"></p>
+      </div>
 
-  <script src="js/app.js"></script>
+      <div class="section-lbl">Livro atual</div>
+      <div class="block" id="home-book">
+        <div class="block-empty">Selecione um livro na aba Leitura</div>
+      </div>
+
+      <div class="section-lbl">Meta de hoje</div>
+      <div class="block" id="home-goal">
+        <div class="goal-row">
+          <span class="goal-desc" id="hg-desc">—</span>
+          <span class="goal-chip" id="hg-chip">0/0</span>
+        </div>
+        <div class="bar"><div class="bar-fill" id="hg-bar"></div></div>
+        <p class="goal-hint" id="hg-hint"></p>
+      </div>
+
+      <div class="section-lbl">Mensagens recentes</div>
+      <div id="home-msgs"><div class="block-empty center">Nenhuma interação ainda</div></div>
+
+    </div>
+
+    <!-- ── LEITURA ── -->
+    <div id="tab-read" class="tabpanel">
+
+      <div class="section-lbl">Livro da Bíblia</div>
+      <div class="block">
+        <select class="field-select" id="book-sel" onchange="onBookChange()">
+          <option value="">Escolha um livro…</option>
+        </select>
+        <div class="book-hint" id="book-hint" style="display:none"></div>
+        <button class="btn-main" onclick="saveBook()">Salvar livro atual</button>
+      </div>
+
+      <div id="chap-section" style="display:none">
+        <div class="section-lbl" id="chap-lbl">Capítulos</div>
+        <div class="block">
+          <div class="chap-meta">
+            <span id="chap-pct-lbl" class="chap-pct-lbl"></span>
+          </div>
+          <div class="bar" style="margin:10px 0 14px"><div class="bar-fill" id="chap-bar"></div></div>
+          <div class="chap-grid" id="chap-grid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── NOTAS ── -->
+    <div id="tab-notes" class="tabpanel">
+
+      <div class="note-tabs">
+        <button class="ntab active" id="nt-mine" onclick="switchNote('mine')">Minhas</button>
+        <button class="ntab" id="nt-partner" onclick="switchNote('partner')">D<span id="partner-art">e</span> <span id="partner-lbl">—</span></button>
+        <button class="ntab" id="nt-together" onclick="switchNote('together')">Juntos ♡</button>
+      </div>
+
+      <!-- MINHAS NOTAS -->
+      <div id="nv-mine">
+        <div class="block" style="margin-top:0">
+          <div class="ref-row">
+            <div style="flex:1">
+              <div class="field-lbl">Cap.</div>
+              <input type="number" class="field-input" id="n-ch" placeholder="—">
+            </div>
+            <div style="flex:1">
+              <div class="field-lbl">Vs.</div>
+              <input type="text" class="field-input" id="n-vs" placeholder="—">
+            </div>
+          </div>
+          <div class="field-lbl" style="margin-top:4px">Anotação</div>
+          <textarea class="field-ta" id="n-text" placeholder="O que o Senhor falou com você…"></textarea>
+          <button class="btn-main" onclick="saveNote()">Salvar anotação</button>
+        </div>
+        <div id="mine-list"></div>
+      </div>
+
+      <!-- NOTAS DO PARCEIRO -->
+      <div id="nv-partner" style="display:none">
+        <div class="partner-header" id="partner-header"></div>
+        <div id="partner-list"></div>
+      </div>
+
+      <!-- JUNTOS -->
+      <div id="nv-together" style="display:none">
+        <div class="together-msgs" id="together-msgs"></div>
+        <div class="together-compose">
+          <textarea class="together-ta" id="together-txt" placeholder="Compartilhe uma reflexão…" rows="2"></textarea>
+          <button class="together-send" onclick="sendMsg()">↑</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── VERSÍCULO ── -->
+    <div id="tab-verse" class="tabpanel">
+
+      <div class="verse-banner" id="verse-rema-banner">
+        <span class="verse-banner-ornament">☩</span>
+        <p class="verse-banner-text" id="vb-text">Toque para um versículo</p>
+        <p class="verse-banner-ref" id="vb-ref"></p>
+        <button class="btn-ghost" onclick="randomVerse()">Novo versículo ↻</button>
+      </div>
+
+      <div class="section-lbl">Registrar versículo rema</div>
+      <div class="block">
+        <div class="field-lbl">Versículo</div>
+        <textarea class="field-ta" id="v-text" placeholder="Digite o versículo…"></textarea>
+        <div class="field-lbl">Referência</div>
+        <input class="field-input" id="v-ref" placeholder="Ex: João 3:16">
+        <button class="btn-main" onclick="saveVerse()">Salvar</button>
+      </div>
+
+      <div class="section-lbl">Versículos salvos</div>
+      <div id="verse-list"></div>
+
+    </div>
+
+    <!-- ── META ── -->
+    <div id="tab-goal" class="tabpanel">
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-n" id="sg-caps">0</div>
+          <div class="stat-l">Caps. lidos</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-n" id="sg-streak">0</div>
+          <div class="stat-l">Dias seguidos</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-n" id="sg-notes">0</div>
+          <div class="stat-l">Anotações</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-n" id="sg-verses">0</div>
+          <div class="stat-l">Versículos</div>
+        </div>
+      </div>
+
+      <div class="section-lbl">Regras de meta</div>
+      <div class="block rules-block">
+        <div class="rule-line">
+          <span class="rule-day">Seg → Sex</span>
+          <span class="rule-val">3 capítulos / dia</span>
+        </div>
+        <div class="rule-sep"></div>
+        <div class="rule-line">
+          <span class="rule-day">Sáb & Dom</span>
+          <span class="rule-val">5 capítulos / dia</span>
+        </div>
+      </div>
+
+      <div class="section-lbl">Progresso de hoje</div>
+      <div class="block">
+        <div class="goal-row">
+          <span class="goal-desc" id="gg-desc">—</span>
+          <span class="goal-chip" id="gg-chip">0/0</span>
+        </div>
+        <div class="bar" style="height:14px;margin-top:10px"><div class="bar-fill" id="gg-bar"></div></div>
+        <p class="goal-hint" id="gg-hint" style="margin-top:8px"></p>
+      </div>
+
+      <div class="section-lbl">Progresso do livro</div>
+      <div class="block" id="goal-book">
+        <div class="block-empty">Nenhum livro selecionado</div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /s-app -->
+
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, setDoc,
+    collection, addDoc, getDocs, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ╔══════════════════════════════════════════╗
+  // ║  🔧 COLE SUA CONFIG FIREBASE AQUI       ║
+  // ╚══════════════════════════════════════════╝
+  const firebaseConfig = {
+    apiKey:            "SUA_API_KEY",
+    authDomain:        "SEU_PROJETO.firebaseapp.com",
+    projectId:         "SEU_PROJETO_ID",
+    storageBucket:     "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId:             "SEU_APP_ID"
+  };
+  // ══════════════════════════════════════════
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  window._db  = db;
+  window._fns = { doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy };
+  window._dispatchFBReady();
+</script>
+
+<script src="js/app.js"></script>
 </body>
 </html>

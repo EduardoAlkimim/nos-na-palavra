@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Nós na Palavra</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- TELA DE SELEÇÃO DE USUÁRIO -->
+  <div id="screen-select" class="screen active">
+    <div class="select-bg">
+      <div class="cross-decor">✝</div>
+    </div>
+    <div class="select-content">
+      <div class="app-logo">
+        <span class="logo-icon">✦</span>
+        <h1>Nós na Palavra</h1>
+        <p>Leitura bíblica a dois</p>
+      </div>
+      <p class="select-prompt">Quem está acessando?</p>
+      <div class="user-cards">
+        <button class="user-card dudu" onclick="selectUser('dudu')">
+          <div class="user-avatar dudu-avatar">D</div>
+          <div class="user-name">Dudu</div>
+          <div class="user-sub">Área do marido</div>
+          <div class="user-arrow">→</div>
+        </button>
+        <button class="user-card thata" onclick="selectUser('thata')">
+          <div class="user-avatar thata-avatar">T</div>
+          <div class="user-name">Thata</div>
+          <div class="user-sub">Área da esposa</div>
+          <div class="user-arrow">→</div>
+        </button>
+      </div>
+      <p class="select-verse">"Dois são melhor do que um" — Eclesiastes 4:9</p>
+    </div>
+  </div>
+
+  <!-- APP PRINCIPAL -->
+  <div id="screen-app" class="screen">
+
+    <!-- HEADER -->
+    <header id="app-header">
+      <button class="back-btn" onclick="backToSelect()">←</button>
+      <div class="header-center">
+        <div class="header-avatar" id="header-avatar"></div>
+        <div>
+          <div class="header-name" id="header-name"></div>
+          <div class="header-book" id="header-book">Nenhum livro selecionado</div>
+        </div>
+      </div>
+      <div class="header-streak" id="header-streak" title="Dias seguidos">🔥 <span id="streak-count">0</span></div>
+    </header>
+
+    <!-- NAV -->
+    <nav id="app-nav">
+      <button class="nav-btn active" data-page="home" onclick="showPage('home',this)">
+        <span class="nav-icon">⌂</span><span class="nav-label">Início</span>
+      </button>
+      <button class="nav-btn" data-page="leitura" onclick="showPage('leitura',this)">
+        <span class="nav-icon">✦</span><span class="nav-label">Leitura</span>
+      </button>
+      <button class="nav-btn" data-page="notas" onclick="showPage('notas',this)">
+        <span class="nav-icon">✎</span><span class="nav-label">Notas</span>
+      </button>
+      <button class="nav-btn" data-page="versiculo" onclick="showPage('versiculo',this)">
+        <span class="nav-icon">☩</span><span class="nav-label">Versículo</span>
+      </button>
+      <button class="nav-btn" data-page="meta" onclick="showPage('meta',this)">
+        <span class="nav-icon">◎</span><span class="nav-label">Meta</span>
+      </button>
+    </nav>
+
+    <!-- PAGES -->
+    <main id="app-main">
+
+      <!-- HOME -->
+      <div id="page-home" class="page active">
+        <div class="verse-hero" id="home-verse-hero">
+          <div class="verse-ornament">✦</div>
+          <p class="verse-hero-text" id="daily-verse-text">Carregando...</p>
+          <p class="verse-hero-ref" id="daily-verse-ref"></p>
+        </div>
+
+        <div class="section-title">Livro atual</div>
+        <div class="book-progress-card" id="home-book-card">
+          <div class="bpc-empty">Selecione um livro na aba Leitura 📚</div>
+        </div>
+
+        <div class="section-title">Meta de hoje</div>
+        <div class="meta-card" id="home-meta-card">
+          <div class="meta-row">
+            <span class="meta-label" id="meta-day-label">Carregando...</span>
+            <span class="meta-badge" id="meta-badge">0/0</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="home-prog"></div></div>
+          <p class="meta-hint" id="meta-hint-text"></p>
+        </div>
+
+        <div class="section-title">Interações recentes</div>
+        <div id="home-interactions">
+          <div class="empty-state">Nenhuma interação ainda 💑</div>
+        </div>
+      </div>
+
+      <!-- LEITURA -->
+      <div id="page-leitura" class="page">
+        <div class="section-title">Selecionar livro</div>
+        <div class="card">
+          <label class="field-label">Livro da Bíblia</label>
+          <select id="book-select" class="field-select" onchange="onBookChange()">
+            <option value="">— Escolha um livro —</option>
+          </select>
+          <div class="book-meta" id="book-meta" style="display:none"></div>
+          <button class="btn-primary" onclick="saveBook()">Salvar como livro atual</button>
+        </div>
+
+        <div id="chapters-section" style="display:none">
+          <div class="section-title">Capítulos</div>
+          <div class="card">
+            <div class="ch-header">
+              <span class="ch-title" id="ch-book-title"></span>
+              <span class="ch-count" id="ch-count-label"></span>
+            </div>
+            <div class="prog-bar" style="margin: 10px 0 6px"><div class="prog-fill" id="ch-prog"></div></div>
+            <p class="ch-pct" id="ch-pct-label"></p>
+            <div class="chapter-grid" id="chapter-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div id="page-notas" class="page">
+        <div class="notes-tabs">
+          <button class="notes-tab active" id="nt-minhas" onclick="switchNoteView('minhas')">Minhas notas</button>
+          <button class="notes-tab" id="nt-parceiro" onclick="switchNoteView('parceiro')">Notas d<span id="nt-parceiro-label">ele/a</span></button>
+          <button class="notes-tab" id="nt-juntos" onclick="switchNoteView('juntos')">💑 Juntos</button>
+        </div>
+
+        <!-- MINHAS -->
+        <div id="notesview-minhas">
+          <div class="card" style="margin-top:0">
+            <label class="field-label">Nova anotação</label>
+            <div class="ref-row">
+              <div style="flex:1">
+                <label class="field-label" style="font-size:10px">Capítulo</label>
+                <input type="number" class="field-input" id="note-ch" placeholder="Cap.">
+              </div>
+              <div style="flex:1">
+                <label class="field-label" style="font-size:10px">Versículo</label>
+                <input type="text" class="field-input" id="note-vs" placeholder="Vs.">
+              </div>
+            </div>
+            <textarea class="field-textarea" id="note-text" placeholder="O que o Senhor falou com você hoje..."></textarea>
+            <button class="btn-primary" onclick="saveNote()">Salvar anotação</button>
+          </div>
+          <div id="my-notes-list"></div>
+        </div>
+
+        <!-- PARCEIRO -->
+        <div id="notesview-parceiro" style="display:none">
+          <div class="partner-banner" id="partner-banner"></div>
+          <div id="partner-notes-list"></div>
+        </div>
+
+        <!-- JUNTOS -->
+        <div id="notesview-juntos" style="display:none">
+          <div class="chat-wrap" id="chat-wrap"></div>
+          <div class="chat-input-area">
+            <textarea class="chat-textarea" id="chat-msg" placeholder="Compartilhe uma reflexão, pergunta..."></textarea>
+            <button class="chat-send" onclick="sendInteraction()">Enviar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VERSÍCULO -->
+      <div id="page-versiculo" class="page">
+        <div class="verse-hero" style="margin-bottom:16px">
+          <div class="verse-ornament">☩</div>
+          <p class="verse-hero-text" id="rema-text">Clique em novo versículo para buscar inspiração</p>
+          <p class="verse-hero-ref" id="rema-ref"></p>
+          <button class="btn-outline" onclick="loadRandomVerse()">Novo versículo ↻</button>
+        </div>
+
+        <div class="section-title">Registrar versículo rema</div>
+        <div class="card">
+          <label class="field-label">Versículo que tocou seu coração</label>
+          <textarea class="field-textarea" id="v-text" placeholder="Digite o versículo..."></textarea>
+          <label class="field-label">Referência (ex: João 3:16)</label>
+          <input type="text" class="field-input" id="v-ref" placeholder="Livro Capítulo:Versículo">
+          <button class="btn-primary" onclick="saveVerse()">Salvar versículo</button>
+        </div>
+
+        <div class="section-title">Versículos salvos</div>
+        <div id="verses-list"></div>
+      </div>
+
+      <!-- META -->
+      <div id="page-meta" class="page">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="st-caps">0</div>
+            <div class="stat-lbl">Caps. lidos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="st-streak">0</div>
+            <div class="stat-lbl">Dias seguidos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="st-notes">0</div>
+            <div class="stat-lbl">Anotações</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="st-verses">0</div>
+            <div class="stat-lbl">Versículos</div>
+          </div>
+        </div>
+
+        <div class="section-title">Regras de meta</div>
+        <div class="card rules-card">
+          <div class="rule-row">
+            <div class="rule-icon">📅</div>
+            <div><strong>Dias de semana</strong><br><span class="rule-sub">3 capítulos por dia</span></div>
+          </div>
+          <div class="rule-divider"></div>
+          <div class="rule-row">
+            <div class="rule-icon">🎉</div>
+            <div><strong>Final de semana</strong><br><span class="rule-sub">5 capítulos por dia</span></div>
+          </div>
+        </div>
+
+        <div class="section-title">Meta de hoje</div>
+        <div class="card">
+          <div class="meta-row" style="margin-bottom:10px">
+            <span id="meta-goal-label" style="font-size:14px;color:var(--fg2)"></span>
+            <span class="streak-pill">🔥 <span id="meta-streak-num">0</span> dias</span>
+          </div>
+          <div class="prog-bar" style="height:16px"><div class="prog-fill" id="meta-prog"></div></div>
+          <p style="font-size:12px;color:var(--fg3);margin-top:6px" id="meta-prog-label"></p>
+        </div>
+
+        <div class="section-title">Progresso do livro</div>
+        <div class="card" id="meta-book-prog">
+          <div class="empty-state">Nenhum livro selecionado</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ============================================
+    // 🔧 CONFIGURAÇÃO FIREBASE — substitua abaixo
+    // ============================================
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      projectId: "SEU_PROJETO_ID",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+    // ============================================
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window._db = db;
+
+    // Expõe helpers globais
+    window._fb = {
+      doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, onSnapshot,
+      userRef: (uid, path) => path ? doc(db, 'users', uid, ...path.split('/')) : doc(db, 'users', uid),
+      colRef: (uid, col) => collection(db, 'users', uid, col),
+      sharedRef: (col) => collection(db, 'shared', 'couple', col),
+      sharedDoc: (path) => doc(db, 'shared', 'couple', ...path.split('/'))
+    };
+  </script>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
